@@ -10,21 +10,28 @@ const apiKey = hiddenAPIKey;
 window.addEventListener("load", function (e) {
     loadClient();
 
+
+    // let sorted = data[1].sort((a, b) => (a.value > b.value) ? -1 : 1);
+    // console.log(JSON.stringify(sorted));
+
+
     let input = document.getElementById('ytchannel');
     let searchButton = document.getElementById('search');
     let results = document.getElementById('results');
     searchButton.addEventListener("click", function () {
         let channelId = parseChannelID(input.value);
         if (channelId) {
+            input.setCustomValidity("");
             results.hidden = false;
             execute(channelId);
         } else {
-            input.setCustomValidity("Wrong Youtube channel URL format")
+            input.setCustomValidity("Wrong Youtube channel URL format");
             input.reportValidity();
             input.value = "";
         }
     });
 });
+
 
 
 gapi.load("client");
@@ -77,9 +84,7 @@ function loadClient() {
 
 
 function parseResponse(response) {
-    if(!response.results) {
-        console.error('Wrong channel URL format');
-    }
+
     let subscriberCount = response.result.items[0].statistics.subscriberCount;
     let channelName = response.result.items[0].snippet.title;
     console.log(channelName);
@@ -91,29 +96,94 @@ function parseResponse(response) {
     let subscriberCountEl = document.getElementById('subscriberCount');
     subscriberCountEl.textContent = parseNumber(subscriberCount);
 
-    let closestCountry = (closestCountryByPop(subscriberCount));
+    let closestCountries = closestCountriesByPop(subscriberCount);
 
-    let countryNameEl = document.getElementById('countryName');
-    countryNameEl.textContent = closestCountry.country.value;
+    let countriesEl = document.getElementById('countryList');
 
-    let populationEl = document.getElementById('countryPop');
-    populationEl.textContent = parseNumber(closestCountry.value);
+    for (let i = 0; i < closestCountries[1].length; i++) {
+        let li = document.createElement('li');
+        const country = closestCountries[1][i];
+        let countryNameEl = document.createElement('h3');
+        countryNameEl.textContent = country.country.value;
+
+        let populationEl = document.createElement('span');
+        populationEl.textContent = parseNumber(country.value);
+
+        li.appendChild(countryNameEl);
+        li.appendChild(populationEl);
+        li.style.backgroundColor = 'salmon';
+        countriesEl.appendChild(li);
+    }
+
+
+    for (let i = 0; i < closestCountries[0].length; i++) {
+        let li = document.createElement('li');
+        const country = closestCountries[0][i];
+        let countryNameEl = document.createElement('h3');
+        countryNameEl.textContent = country.country.value;
+
+        let populationEl = document.createElement('span');
+        populationEl.textContent = parseNumber(country.value);
+
+        li.appendChild(countryNameEl);
+        li.appendChild(populationEl);
+        li.style.backgroundColor = 'palegreen';
+        countriesEl.appendChild(li);
+    }
 
 
 }
 
 
-function closestCountryByPop(subscriberCount) {
+// Return three higher pop countries and three lower pop countries (if there are any)
+function closestCountriesByPop(subscriberCount) {
     subscriberCount = parseInt(subscriberCount);
-    let current = data[1][0];
+    let closestCountry = data[1][0];
+    let closestLowerThree = [];
+    let closestHigherThree = [];
 
+    let closest;
+    closestIdx = 0;
     for (let i = 0; i < data[1].length; i++) {
         const population = data[1][i].value;
-        if (population != null && Math.abs(subscriberCount - population) < Math.abs(subscriberCount - current.value)) {
-            current = data[1][i];
+        if (population != null && Math.abs(subscriberCount - population) < Math.abs(subscriberCount - closestCountry.value)) {
+            closestCountry = data[1][i];
+            closestIdx = i;
         }
     }
-    return current;
+
+    // Include the closest match
+    if (closestCountry.value > subscriberCount) {
+        closestHigherThree.push(closestCountry);
+    } else if (closestCountry.value < subscriberCount) {
+        closestLowerThree.push(closestCountry);
+    }
+
+
+    // Next lower three population countries are the next three indexes in the sorted array.
+    for (let i = 1; i <= 3; i++) {
+        const country = data[1][closestIdx + i];
+        if(country == undefined) {
+            break;
+        } else if (closestLowerThree.length < 3) {
+            closestLowerThree.push(country);
+        }
+    }
+
+    // Same but going down.
+    for (let i = 1; i <= 3; i++) {
+        const country = data[1][closestIdx - i];
+        if(country == undefined) {
+            break;
+        } else if (closestHigherThree.length < 3) {
+            closestHigherThree.push(country);
+        }
+    }
+
+    closestHigherThree.reverse();
+
+    console.dir([closestLowerThree, closestHigherThree]);
+    return [closestLowerThree, closestHigherThree];
 }
 
 
