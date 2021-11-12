@@ -1,4 +1,158 @@
-#channel label, input {
-    /* margin-left: 10%; */
-    display: block;
+@import url(https://fonts.googleapis.com/css?family=Open+Sans:600,400);
+
+html, body {
+    height: 100%;
+    font-family: 'Open Sans', Arial, Helvetica, sans-serif;
+    background: #5c6169;
+}
+
+header {
+    text-align: center;
+    color: white;
+    font-size: 15px;
+}
+
+#flexContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#content {
+    background: #fff;
+    overflow: hidden;
+    box-shadow: 10px 10px 15px 0 rgba(0,0,0,0.3);
+    width: 65%;
+    max-width: 700px;
+    border-radius: 4px;
+
+}
+
+#UI {
+    padding: 1.5em;
+    /* background: #d7dbe0; */
+    overflow: hidden;
+}
+
+hr {
+    margin: 0px 10px 0px 10px;
+}
+
+#inputs {
+    border-radius: 4px;
+    overflow: hidden;
+    background: #fff;
+    padding: 3px;
+    display: flex;
+}
+
+
+#channelInput {
+    /* border: none; */
+    overflow: hidden;
+    /* color: #4d8dcb; */
+    padding: 0.9em;
+    width: 100%;
+    margin-right: 0.5em;
+    flex-grow: 1;
+}
+
+#search {
+    cursor: pointer;
+    border-width: 1px;
+    /* border-width: 1px; */
+    border-radius: 3px;
+    font-weight: 600;
+    background: #fff;
+    /* overflow: hidden; */
+    /* color: rgb(68, 68, 68); */
+}
+
+ul {
+    list-style-type: none;
+    padding-left: 0px;
+    margin-top: 0;
+    margin-bottom: 0;
+} 
+
+ul li {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0.5em;
+    margin-right: 0.5em;
+    padding: 0.5em;
+    border-radius: 4px;
+    /* box-shadow: 5px 5px 5px 0 rgba(0,0,0,0.2); */
+}
+
+ul li:last-child {
+    margin-bottom: 0px;
+}
+
+li.higher {
+    background-color: salmon;
+}
+
+li.lower {
+    background-color: palegreen;
+}
+
+#countries {
+    width: 100%;
+    flex-grow: 1;
+}
+
+.countryName {
+    font-weight: bold;
+}
+
+#results {
+    background: #fff;
+    display: flex;
+    visibility: hidden;
+    padding: 1.5em;
+}
+
+
+
+#channel {
+    align-self: center;
+    display: flex;
+    height: 100px;
+    align-items: center;
+    
+    animation-name: slidein;
+    animation-duration: 2.5s;
+}
+
+#channel div {
+    margin-left: 0.5em;
+    display: flex;
+    flex-direction: column;
+    /* align-items: center; */
+}
+
+#channelName {
+    font-weight: bold;
+}
+
+
+img {
+    /* border: solid rgb(173, 173, 173); */
+    align-self: center;
+    height: 75%;
+    border-radius: 50%;
+    box-shadow: 5px 5px 5px 0 rgba(0,0,0,0.2);
+}
+
+@keyframes slidein {
+    from {
+        opacity: 0%;
+        transform: translate(0, 130%);
+    }
+    to {
+        opacity: 100%;
+        transform: translate(0,0px);
+    }
 }
