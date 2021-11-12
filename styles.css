@@ -1,5 +1,10 @@
 @import url(https://fonts.googleapis.com/css?family=Open+Sans:600,400);
 
+:root {
+    --em-start: 0;
+    --em-end: 2;
+}
+
 html, body {
     height: 100%;
     font-family: 'Open Sans', Arial, Helvetica, sans-serif;
@@ -66,7 +71,11 @@ hr {
     font-weight: 600;
     background: #fff;
     /* overflow: hidden; */
-    /* color: rgb(68, 68, 68); */
+    color: rgb(68, 68, 68);
+}
+
+#search:hover {
+    opacity: 70%;
 }
 
 ul {
@@ -110,7 +119,6 @@ li.lower {
 #results {
     background: #fff;
     display: flex;
-    visibility: hidden;
     padding: 1.5em;
 }
 
@@ -121,6 +129,8 @@ li.lower {
     display: flex;
     height: 100px;
     align-items: center;
+
+    transform: translate(0, calc((60px + 0.5em) * var(--em-end)));
     
     animation-name: slidein;
     animation-duration: 2.5s;
@@ -149,10 +159,10 @@ img {
 @keyframes slidein {
     from {
         opacity: 0%;
-        transform: translate(0, 130%);
+        transform: translate(0, calc((60px + 0.5em) * var(--em-start)));
     }
     to {
         opacity: 100%;
-        transform: translate(0,0px);
+        transform: translate(0, calc((60px + 0.5em) * var(--em-end)));
     }
 }

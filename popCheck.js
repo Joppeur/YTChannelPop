@@ -1,5 +1,8 @@
 "use strict;"
 
+const LOWER_COUNTRIES_COUNT = 3;
+const HIGHER_COUNTRIES_COUNT = 3;
+
 console.log(data);
 var responseTest;
 
@@ -17,7 +20,7 @@ window.addEventListener("load", function (e) {
         let channelId = parseChannelID(input.value);
         if (channelId) {
             input.setCustomValidity("");
-            results.style.visibility = 'visible';
+            //results.style.visibility = 'visible';
             execute(channelId);
         } else {
             input.setCustomValidity("Wrong Youtube channel URL format");
@@ -29,18 +32,19 @@ window.addEventListener("load", function (e) {
 });
 
 
-function pointChannelAtCountry() {
-    let lastHigherCountry = getLastHigherCountry();
-    let channel = document.getElementById('channel');
-    console.log('halloo');
-    console.log(channel);
-    let countryLocation = lastHigherCountry.getBoundingClientRect();
-    console.log(lastHigherCountry);
-    console.log(countryLocation);
-    // channel.style.left = countryLocation.left + 'px';
-    // channel.style.right = countryLocation.right + 'px';
-    // channel.style.top = countryLocation.top + 'px';
-    // channel.style.bottom = countryLocation.bottom + 'px';
+function pointChannelAtCountry(closestCountries) {
+    let lowerCountries = closestCountries[0];
+    let end = 0;
+
+    for (let i = lowerCountries.length; i < LOWER_COUNTRIES_COUNT; i++) {
+        end += 0.5;
+    }
+    if (lowerCountries.length === 0) {
+        end = 1;
+    }
+    let start = end + 1;
+    document.documentElement.style.setProperty('--em-start', start);
+    document.documentElement.style.setProperty('--em-end', end);
 }
 
 function getLastHigherCountry() {
@@ -73,7 +77,7 @@ function execute(channelId) {
         .then(function (response) {
             console.log("Response", response.result);
             responseTest = response.result;
-            parseResponse(response);
+            displayResponse(response);
             pointChannelAtCountry();
         },
             function (err) { console.error("Execute error", err); });
@@ -108,34 +112,82 @@ function loadClient() {
 }
 
 
-async function parseResponse(response) {
+async function displayResponse(response) {
     let items = response.result.items[0];
     let subscriberCount = items.statistics.subscriberCount;
     let channelName = items.snippet.title;
     console.log(channelName);
     console.log("Subscribers: ", parseNumber(subscriberCount));
 
+    deleteResultsSection();
+    createResultsSection();
+    
+    
     let channelNameEl = document.getElementById('channelName');
     channelNameEl.textContent = channelName;
     let subscriberCountEl = document.getElementById('subscriberCount');
     subscriberCountEl.textContent = parseNumber(subscriberCount);
-
-    let closestCountries = closestCountriesByPop(subscriberCount);
+    
     let countriesEl = document.getElementById('countryList');
-
+    let closestCountries = closestCountriesByPop(subscriberCount);
     createCountryElementsFromArr(closestCountries[1], countriesEl, true);
     createCountryElementsFromArr(closestCountries[0], countriesEl, false);
 
+    
     let thumbnailURL = items.snippet.thumbnails.medium.url;
+    let img = document.getElementById('thumbnail');
+    img.setAttribute('src', thumbnailURL);
+    
+    pointChannelAtCountry(closestCountries);
+    return true;
+}
+
+function deleteResultsSection() {
+    let results = document.getElementById('results')
+    if (results === null) {
+        return false;
+    } else {
+        results.remove();
+        let hr = document.getElementsByTagName('hr');
+        hr[0].remove();
+        return true;
+    }
+}
+
+
+
+function createResultsSection() {
+    let section = document.createElement('section');
+    section.setAttribute('id', 'results');
+
+    let div1 = document.createElement('div');
+    div1.setAttribute('id', "countries");
+    let ul1 = document.createElement('ul');
+    ul1.setAttribute('id', "countryList");
+
+    let div2 = document.createElement('div');
+    div2.setAttribute('id', 'channel');
+    let div3 = document.createElement('div');
     let img = document.createElement('img');
     img.setAttribute('id', 'thumbnail');
-    img.setAttribute('src', thumbnailURL);
     img.setAttribute('alt', 'Thumbnail');
-    let channelEl = document.getElementById('channel');
-    channelEl.prepend(img);
-
-
-    return true;
+    let span1 = document.createElement('span');
+    span1.setAttribute('id', 'channelName');
+    let span2 = document.createElement('span');
+    span2.setAttribute('id', 'subscriberCount');
+    let hr = document.createElement('hr');
+    
+    section.appendChild(div1);
+    div1.appendChild(ul1);
+    section.appendChild(div2);
+    div2.appendChild(img);
+    div2.appendChild(div3);
+    div3.appendChild(span1);
+    div3.appendChild(span2);
+    
+    let parent = document.getElementById('content');
+    parent.appendChild(hr);
+    parent.appendChild(section);
 }
 
 function createCountryElementsFromArr(countries, parentElement, higherPop) {
